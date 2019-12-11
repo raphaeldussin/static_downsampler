@@ -44,7 +44,6 @@ def sum_on_supergrid(ds, variable, pointtype, inputgrid='symetric',
                      outputgrid='nonsymetric', dimvar_map=None,
                      dimsum=('x', 'y')):
     """ sum variables on super grid (e.g. dx, dy) """
-    #print(pointtype)
     # if present, apply name mapping
     tmp = apply_name_mapping(ds, dimvar_map=dimvar_map)
     # check grid for consistency
@@ -150,4 +149,3 @@ def sum_by_2_elements(array, axis=0):
                                                        array[:, 1::2],
                                                        fillvalue=0)])
     return out
-
