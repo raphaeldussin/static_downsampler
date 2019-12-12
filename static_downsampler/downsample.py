@@ -22,13 +22,11 @@ def downsample2_dataset(ds):
     ds_d2['Coriolis'] = downsample2_coord(ds, coord='Coriolis', point='Q')
 
     ds_d2['dxt'] = downsample2_gridmetric(ds, metric='dx', point='T')
-    # does not work, needs periodicity
-    # ds_d2['dxCu'] = downsample2_gridmetric(ds, metric='dx', point='U')
+    ds_d2['dxCu'] = downsample2_gridmetric(ds, metric='dx', point='U')
     ds_d2['dxCv'] = downsample2_gridmetric(ds, metric='dx', point='V')
 
     ds_d2['dyt'] = downsample2_gridmetric(ds, metric='dy', point='T')
     ds_d2['dyCu'] = downsample2_gridmetric(ds, metric='dy', point='U')
-    # works but should need north pole value
     ds_d2['dyCv'] = downsample2_gridmetric(ds, metric='dy', point='V')
 
     ds_d2['areacello'] = downsample2_2dvar(ds, 'areacello', 'T', op='sum')
@@ -123,11 +121,12 @@ def downsample2_gridmetric(ds, metric='dx', point='T'):
     if metric == 'dx':
         varin = 'dxCv'
         axis = 1
-        workarray = ds[varin].values[Js::2, Is:]
+        workarray = np.roll(ds[varin].values, -1, axis=1)[::2, :]
     elif metric == 'dy':
         varin = 'dyCu'
         axis = 0
-        workarray = ds[varin].values[Js:, Is::2]
+        workarray = np.roll(ds[varin].values, -1, axis=0)[:, ::2]
+        workarray[-1, :] = workarray[-2, :]
     else:
         raise ValueError('unknown coordinate')
 
