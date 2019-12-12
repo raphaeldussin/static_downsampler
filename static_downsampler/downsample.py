@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import numpy as np
 import xarray as xr
 from static_downsampler.static import sum_by_2_elements

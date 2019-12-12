@@ -10,5 +10,6 @@ setuptools.setup(
     license="GPLv3",
     keywords="",
     url="https://github.com/raphaeldussin/static_downsampler",
-    packages=['static_downsampler']
+    packages=['static_downsampler'],
+    scripts=['static_downsampler/downsample.py']
 )
