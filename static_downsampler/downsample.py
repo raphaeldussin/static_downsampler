@@ -3,6 +3,7 @@ import numpy as np
 import xarray as xr
 from static_downsampler.static import sum_by_2_elements
 from static_downsampler.static import apply_name_mapping
+from static_downsampler.make_basin_mask_d2 import create_basin_code
 from numba import njit
 import argparse
 
@@ -46,6 +47,8 @@ def downsample2_dataset(ds):
     ds_d2['wet_c'] = downsample2_2dvar(ds, 'wet_c', 'Q', op='mask')
     ds_d2['wet_u'] = downsample2_2dvar(ds, 'wet_u', 'U', op='mask')
     ds_d2['wet_v'] = downsample2_2dvar(ds, 'wet_v', 'V', op='mask')
+
+    ds_d2['basin'] = create_basin_code(ds_d2)
 
     return ds_d2
 
