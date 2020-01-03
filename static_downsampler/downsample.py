@@ -50,6 +50,12 @@ def downsample2_dataset(ds):
 
     ds_d2['basin'] = create_basin_code(ds_d2)
 
+    override = downsample2_nominal_coord(ds)
+    ds_d2['xh'] = override['xh']
+    ds_d2['xq'] = override['xq']
+    ds_d2['yh'] = override['yh']
+    ds_d2['yq'] = override['yq']
+
     return ds_d2
 
 
@@ -66,10 +72,10 @@ def downsample2_nominal_coord(ds):
     xq_d2 = ds['xq'].values[(Is+1)::2]
     yq_d2 = ds['yq'].values[(Js+1)::2]
 
-    downsampled_ds = xr.Dataset(coords={'xh': (('xh'), xh_d2),
-                                        'yh': (('yh'), yh_d2),
-                                        'xq': (('xq'), xq_d2),
-                                        'yq': (('yq'), yq_d2)})
+    downsampled_ds = xr.Dataset(coords={'xh': (('xh'), xh_d2, {'units': 'degrees_east', 'cartesian_axis': 'X'}),
+                                        'yh': (('yh'), yh_d2, {'units': 'degrees_north', 'cartesian_axis': 'Y'}),
+                                        'xq': (('xq'), xq_d2, {'units': 'degrees_east', 'cartesian_axis': 'X'}),
+                                        'yq': (('yq'), yq_d2, {'units': 'degrees_north', 'cartesian_axis': 'Y'})})
     return downsampled_ds
 
 
