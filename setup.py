@@ -12,5 +12,6 @@ setuptools.setup(
     url="https://github.com/raphaeldussin/static_downsampler",
     packages=['static_downsampler'],
     scripts=['static_downsampler/downsample.py',
-             'static_downsampler/create_hgrid_d2.py']
+             'static_downsampler/create_hgrid_d2.py',
+             'static_downsampler/make_basin_mask_d2.py']
 )

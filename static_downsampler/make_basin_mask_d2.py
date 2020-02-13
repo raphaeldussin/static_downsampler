@@ -3,6 +3,7 @@
 import netCDF4
 import numpy
 import xarray as xr
+import argparse
 
 
 def ice9it(i, j, depth, minD=0.):
@@ -172,3 +173,18 @@ def create_basin_code(ds):
     out.attrs['flag_meanings'] = "1:Southern Ocean, 2:Atlantic Ocean, 3:Pacific Ocean, 4:Arctic Ocean, 5:Indian Ocean, 6:Mediterranean Sea, 7:Black Sea, 8:Hudson Bay, 9:Baltic Sea, 10:Red Sea, 11:Persian Gulf"
     out.attrs['flag_values'] = "1,2,3,4,5,6,7,8,9,10,11"
     return out
+
+
+if __name__ == '__main__':
+  """ cmd line version """
+  parser = argparse.ArgumentParser(description='Create basin codes for OM')
+  parser.add_argument('-i', '--infile', type=str, required=True,
+                      help='input file')
+  parser.add_argument('-o', '--outfile', type=str,
+                      required=True, help='output file')
+
+  args = parser.parse_args()
+
+  ds = xr.open_dataset(args.infile)
+  ds['basin'] = create_basin_code(ds)
+  ds.to_netcdf(args.outfile)
