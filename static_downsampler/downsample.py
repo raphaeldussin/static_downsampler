@@ -268,6 +268,26 @@ def mask_kernel_d2(array):
     return out
 
 
+def fix_attributes(ds, ds_d2):
+    """ copy variable attributes from a source ds """
+    listvar = list(ds_d2.variables)
+    for v in listvar:
+        if v in ds.variables:
+            ds_d2[v].attrs = ds[v].attrs
+        ds_d2[v].encoding = {'_FillValue': 1.e+20,
+                             'missing_value': 1.e+20}
+    return ds_d2
+
+
+def add_FREGRID_hack(ds_d2):
+    """ add netcdf attributes to areacello_* so that fregrid
+    does not die when regridding static file """
+    ds_d2['areacello_bu'].attrs.update({'interp_method': 'none'})
+    ds_d2['areacello_cu'].attrs.update({'interp_method': 'none'})
+    ds_d2['areacello_cv'].attrs.update({'interp_method': 'none'})
+    return ds_d2
+
+
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description='create downsampled' +
@@ -282,4 +302,7 @@ if __name__ == "__main__":
 
     ds = xr.open_dataset(args.static)
     ds_d2 = downsample2_dataset(ds)
-    ds_d2.to_netcdf(args.output)
+    ds_d2 = fix_attributes(ds, ds_d2)
+    ds_d2.attrs.update({'external_variables': "areacello areacello"})
+    ds_d2 = add_FREGRID_hack(ds_d2)
+    ds_d2.to_netcdf(args.output, format='NETCDF3_64BIT')
