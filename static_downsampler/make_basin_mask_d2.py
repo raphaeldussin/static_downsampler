@@ -121,7 +121,7 @@ def create_basin_code(ds):
     print('Processing Arctic ...')
     tmp = wet*(
               (1-southOf(x, y, (-171.,66.), (-166.,65.5))) * (1-southOf(x, y, (-64.,66.4), (-50.,68.5))) # Lab Sea
-         +    southOf(x, y, (-50.,0.), (-50.,90.)) * (1- southOf(x, y, (0.,65.5), (360.,65.5))  ) # Denmark Strait
+         +    southOf(x, y, (-50.,0.), (-50.,90.)) * (1- southOf(x, y, (0.,65.39), (360.,65.39))  ) # Denmark Strait
          +    southOf(x, y, (-18.,0.), (-18.,65.)) * (1- southOf(x, y, (0.,64.9), (360.,64.9))  ) # Iceland-Sweden
          +    southOf(x, y, (20.,0.), (20.,90.)) # Barents Sea
          +    (1-southOf(x, y, (-280.,55.), (-200.,65.)))
