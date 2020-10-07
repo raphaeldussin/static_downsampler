@@ -42,7 +42,7 @@ if __name__ == "__main__":
     out['dy'] = xr.DataArray(data=dy_d2, dims=('ny', 'nxp'))
     out['area'] = xr.DataArray(data=area_xy_d2, dims=('ny', 'nx'))
 
-    out.to_netcdf(args.output)
+    out.to_netcdf(args.output, format='NETCDF3_64BIT')
 
     # re-open to append tile information
     fout = netCDF4.Dataset(args.output, 'a')

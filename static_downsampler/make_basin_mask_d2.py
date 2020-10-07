@@ -187,4 +187,4 @@ if __name__ == '__main__':
 
   ds = xr.open_dataset(args.infile)
   ds['basin'] = create_basin_code(ds)
-  ds.to_netcdf(args.outfile)
+  ds.to_netcdf(args.outfile, format='NETCDF3_64BIT')
