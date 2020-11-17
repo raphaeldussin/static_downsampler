@@ -2,6 +2,7 @@ import itertools as it
 
 import numpy as np
 import xarray as xr
+import warnings
 
 
 def init_static_file():
@@ -64,19 +65,24 @@ def sum_on_supergrid(
     # getting start point for array
     isc, jsc, IscB, JscB = define_start_point(inputgrid, outputgrid)
 
+    if outputgrid == "symetric":
+        tmpvar = extend_supergrid_array(tmp[variable])
+    else:
+        tmpvar = tmp[variable]
+
     if pointtype == "T":
         dims = ("yh", "xh")
-        workarray = tmp[variable].values[0:, 0:]
+        workarray = tmpvar.values[0:, 0:]
     elif pointtype == "U":
         dims = ("yh", "xq")
-        workarray = np.roll(tmp[variable].values[0:, 0:], -1, axis=1)
+        workarray = np.roll(tmpvar.values[0:, 0:], -1, axis=1)
     elif pointtype == "V":
         dims = ("yq", "xh")
-        workarray = np.roll(tmp[variable].values[0:, 0:], -1, axis=0)
+        workarray = np.roll(tmpvar.values[0:, 0:], -1, axis=0)
         workarray[-1, :] = workarray[-2, :]
     elif pointtype == "Q":
         dims = ("yq", "xq")
-        workarray = np.roll(tmp[variable].values[0:, 0:], -1, axis=0)
+        workarray = np.roll(tmpvar.values[0:, 0:], -1, axis=0)
         workarray[-1, :] = workarray[-2, :]
         workarray = np.roll(workarray, -1, axis=1)
     else:
@@ -162,4 +168,21 @@ def sum_by_2_elements(array, axis=0):
         out = np.array(
             [sum(r) for r in it.zip_longest(array[:, ::2], array[:, 1::2], fillvalue=0)]
         )
+    return out
+
+
+def extend_supergrid_array(array):
+    """ extend supergrid array, assuming periodic/tripolar grid"""
+    warnings.warn("assuming the grid is periodic and tripolar")
+    tmp = array.values
+    inner = xr.DataArray(tmp, dims=("y", "x"))
+    # northfold: take areas of north row and mirror it
+    northfold = xr.DataArray(tmp[-1, ::-1], dims=("x"))
+    # southern boundary
+    south = xr.DataArray(tmp[0, :], dims=("x"))
+    inner_w_poles = xr.concat([south, inner, northfold], dim="y")
+    # apply E-W boundary condition
+    west = xr.DataArray(inner_w_poles[-1, :], dims=("y"))
+    east = xr.DataArray(inner_w_poles[0, :], dims=("y"))
+    out = xr.concat([west, inner_w_poles, east], dim="x")
     return out
