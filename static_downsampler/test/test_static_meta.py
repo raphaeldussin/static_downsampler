@@ -28,7 +28,7 @@ GRID_OM4_05 = os.path.join(
 )
 
 
-@pytest.mark.parametrize("FIXTURE_DIR", [GRID_OM4_125, GRID_OM4_025, GRID_OM4_05])
+@pytest.mark.parametrize("FIXTURE_DIR", [GRID_OM4_025, GRID_OM4_05])
 def test_lonlat(datafiles, FIXTURE_DIR):
     ds = xr.open_dataset(FIXTURE_DIR + "ocean_hgrid.nc")
     ds_check = xr.open_dataset(FIXTURE_DIR + "ocean_static.nc")
@@ -57,7 +57,7 @@ def test_lonlat(datafiles, FIXTURE_DIR):
     assert np.array_equal(static["geolat_c"].values, ds_check["geolat_c"].values)
 
 
-@pytest.mark.parametrize("FIXTURE_DIR", [GRID_OM4_125, GRID_OM4_025, GRID_OM4_05])
+@pytest.mark.parametrize("FIXTURE_DIR", [GRID_OM4_025, GRID_OM4_05])
 def test_dxdy(datafiles, FIXTURE_DIR):
     ds = xr.open_dataset(FIXTURE_DIR + "ocean_hgrid.nc")
     ds_check = xr.open_dataset(FIXTURE_DIR + "ocean_static.nc")
@@ -81,7 +81,7 @@ def test_dxdy(datafiles, FIXTURE_DIR):
     assert np.array_equal(static["dyCv"].values, ds_check["dyCv"].values)
 
 
-@pytest.mark.parametrize("FIXTURE_DIR", [GRID_OM4_125, GRID_OM4_025, GRID_OM4_05])
+@pytest.mark.parametrize("FIXTURE_DIR", [GRID_OM4_025, GRID_OM4_05])
 def test_area(datafiles, FIXTURE_DIR):
     ds = xr.open_dataset(FIXTURE_DIR + "ocean_hgrid.nc")
     ds_check = xr.open_dataset(FIXTURE_DIR + "ocean_static.nc")
