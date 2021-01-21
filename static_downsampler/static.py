@@ -2,7 +2,6 @@ import itertools as it
 
 import numpy as np
 import xarray as xr
-import warnings
 
 
 def init_static_file():
@@ -52,52 +51,64 @@ def sum_on_supergrid(
     ds,
     variable,
     pointtype,
-    inputgrid="symetric",
     outputgrid="nonsymetric",
     dimvar_map=None,
     dimsum=("x", "y"),
+    is_regional=False,
 ):
     """ sum variables on super grid (e.g. dx, dy) """
+
+    if is_regional:
+        raise NotImplementedError("this is not suited for regional grids yet")
+
     # if present, apply name mapping
     tmp = apply_name_mapping(ds, dimvar_map=dimvar_map)
-    # check grid for consistency
-    check_grid(tmp, inputgrid)
+    # check grid for consistency, supergrid must be symetric
+    check_grid(tmp, "symetric")
     # getting start point for array
-    isc, jsc, IscB, JscB = define_start_point(inputgrid, outputgrid)
+    isc, jsc, IscB, JscB = define_start_point("symetric", outputgrid)
 
-    if outputgrid == "symetric":
-        tmpvar = extend_supergrid_array(tmp[variable])
+    if not is_regional:
+        # use periodicity and north pole fold to extend supergrid
+        ext_array = extend_supergrid_array(tmp[variable])
+        # we need to shift indices to account for the extra
+        # row/column on the south/east
+        isc += 1
+        jsc += 1
+        IscB += 1
+        JscB += 1
     else:
-        tmpvar = tmp[variable]
+        ext_array = tmp[variable]
+
+    ny, nx = ext_array.shape
+    last = 0 if is_regional else 1
 
     if pointtype == "T":
         dims = ("yh", "xh")
-        workarray = tmpvar.values[0:, 0:]
+        workarray = ext_array.isel(
+            x=slice(isc - 1, nx - last), y=slice(jsc - 1, ny - last)
+        )
     elif pointtype == "U":
         dims = ("yh", "xq")
-        workarray = np.roll(tmpvar.values[0:, 0:], -1, axis=1)
+        workarray = ext_array.isel(x=slice(IscB - 1, nx), y=slice(jsc - 1, ny - last))
     elif pointtype == "V":
         dims = ("yq", "xh")
-        workarray = np.roll(tmpvar.values[0:, 0:], -1, axis=0)
-        workarray[-1, :] = workarray[-2, :]
+        workarray = ext_array.isel(x=slice(isc - 1, nx - last), y=slice(JscB - 1, ny))
     elif pointtype == "Q":
         dims = ("yq", "xq")
-        workarray = np.roll(tmpvar.values[0:, 0:], -1, axis=0)
-        workarray[-1, :] = workarray[-2, :]
-        workarray = np.roll(workarray, -1, axis=1)
-    else:
-        raise NotImplementedError("Unknown point type")
+        workarray = ext_array.isel(x=slice(IscB - 1, nx), y=slice(JscB - 1, ny))
 
+    ny, nx = workarray.shape
     if "x" in dimsum:
-        out_x = sum_by_2_elements(workarray, axis=1)
+        out_x = workarray.coarsen(x=2).sum()
     else:
-        out_x = workarray[:, 1::2]
+        out_x = workarray.isel(x=slice(1, nx, 2))
     if "y" in dimsum:
-        out_xy = sum_by_2_elements(out_x, axis=0)
+        out_xy = out_x.coarsen(y=2).sum()
     else:
-        out_xy = out_x[1::2, :]
+        out_xy = out_x.isel(y=slice(1, ny, 2))
 
-    out = xr.DataArray(data=out_xy.astype("f4"), dims=dims)
+    out = xr.DataArray(data=out_xy.values.astype("f4"), dims=dims)
     return out
 
 
@@ -134,7 +145,7 @@ def define_start_point(inputgrid, outputgrid):
             IscB = 0
             JscB = 0
     elif inputgrid == "nonsymetric":
-        raise NotImplementedError("Supergrid should never be nonsymetric")
+        raise ValueError("Supergrid should never be nonsymetric")
     else:
         raise ValueError("input grid can only be symetric or nonsymetric")
     return isc, jsc, IscB, JscB
@@ -173,7 +184,6 @@ def sum_by_2_elements(array, axis=0):
 
 def extend_supergrid_array(array):
     """ extend supergrid array, assuming periodic/tripolar grid"""
-    warnings.warn("assuming the grid is periodic and tripolar")
     tmp = array.values
     inner = xr.DataArray(tmp, dims=("y", "x"))
     # northfold: take areas of north row and mirror it
