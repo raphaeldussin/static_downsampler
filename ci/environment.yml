@@ -1,0 +1,13 @@
+name: static_downsampler
+channels:
+  - conda-forge
+dependencies:
+  - python
+  - black
+  - flake8
+  - matplotlib
+  - netcdf4
+  - numpy
+  - pip
+  - pytest
+  - xarray

@@ -1,4 +1,4 @@
-''' setup for static_downsampler '''
+""" setup for static_downsampler """
 import setuptools
 
 setuptools.setup(
@@ -10,8 +10,10 @@ setuptools.setup(
     license="GPLv3",
     keywords="",
     url="https://github.com/raphaeldussin/static_downsampler",
-    packages=['static_downsampler'],
-    scripts=['static_downsampler/downsample.py',
-             'static_downsampler/create_hgrid_d2.py',
-             'static_downsampler/make_basin_mask_d2.py']
+    packages=["static_downsampler"],
+    scripts=[
+        "static_downsampler/downsample.py",
+        "static_downsampler/create_hgrid_d2.py",
+        "static_downsampler/make_basin_mask_d2.py",
+    ],
 )
