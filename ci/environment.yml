@@ -11,3 +11,5 @@ dependencies:
   - pip
   - pytest
   - xarray
+  - pip:
+    - pytest-datafiles
