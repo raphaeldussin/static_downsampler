@@ -1,6 +1,4 @@
 # requires pytest-datafiles
-import os
-
 import numpy as np
 import pytest
 import xarray as xr
@@ -66,9 +64,6 @@ ds_nonsym = xr.Dataset(
         ),
     ),
 )
-
-
-print(ds_sym)
 
 
 @pytest.mark.parametrize("INPUTGRID", ["symetric"])
