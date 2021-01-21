@@ -51,6 +51,14 @@ jobs:
       - name: Lint with flake8
         run: |
           flake8 . --max-line-length=999
+      - name: Download test files
+        run: |
+          pushd static_downsampler/test/files_OM4_05
+          make
+          popd
+          pushd static_downsampler/test/files_OM4_025
+          make
+          popd
       - name: Test with pytest
         run: |
           pytest -v static_downsampler
