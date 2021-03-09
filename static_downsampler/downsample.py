@@ -34,9 +34,15 @@ def downsample2_dataset(ds, sym=False):
     ds_d2["dyCv"] = downsample2_gridmetric(ds, metric="dy", point="V", sym=sym)
 
     ds_d2["areacello"] = downsample2_2dvar(ds, "areacello", "T", op="sum", sym=sym)
-    ds_d2["areacello_bu"] = downsample2_2dvar(ds, "areacello_bu", "Q", op="sum", sym=sym)
-    ds_d2["areacello_cu"] = downsample2_2dvar(ds, "areacello_cu", "U", op="sum", sym=sym)
-    ds_d2["areacello_cv"] = downsample2_2dvar(ds, "areacello_cv", "V", op="sum", sym=sym)
+    ds_d2["areacello_bu"] = downsample2_2dvar(
+        ds, "areacello_bu", "Q", op="sum", sym=sym
+    )
+    ds_d2["areacello_cu"] = downsample2_2dvar(
+        ds, "areacello_cu", "U", op="sum", sym=sym
+    )
+    ds_d2["areacello_cv"] = downsample2_2dvar(
+        ds, "areacello_cv", "V", op="sum", sym=sym
+    )
 
     ds_d2["deptho"] = downsample2_2dvar(ds, "deptho", "T", op="masked_avg", sym=sym)
     ds_d2["hfgeou"] = downsample2_2dvar(ds, "hfgeou", "T", op="masked_avg", sym=sym)
@@ -143,10 +149,10 @@ def downsample2_gridmetric(ds, metric="dx", point="T", sym=False):
     # since the downsampled grid is build from Q-point of the native grid
     if metric == "dx":
         varin = "dxCv"
-        dimsin = ('yq', 'xh')
+        dimsin = ("yq", "xh")
     elif metric == "dy":
         varin = "dyCu"
-        dimsin = ('yh', 'xq')
+        dimsin = ("yh", "xq")
 
     # get the dimensions of the output array
     _, _, dims = define_staggering(point, sym=sym)
@@ -170,33 +176,33 @@ def downsample2_gridmetric(ds, metric="dx", point="T", sym=False):
     # hence it needs to be rolled to the starting index so it keeps an even
     # number of points, and subsampled starting from the index on the other axis
     if metric == "dx":
-        rollaxis = 'xh'  # rolling axis is X
-        subaxis = 'yq'   # subsample axis is Y
-        sumaxis = 1      # summation axis is X (=1 for numpy)
+        rollaxis = "xh"  # rolling axis is X
+        subaxis = "yq"  # subsample axis is Y
+        sumaxis = 1  # summation axis is X (=1 for numpy)
         ny, nx = ds[varin].shape
 
         # subsample along Y
-        tmp = ds[varin].isel({subaxis: slice(Js,ny+1,2)})
+        tmp = ds[varin].isel({subaxis: slice(Js, ny + 1, 2)})
         # roll along X (correct if E-W periodic)
-        tmp = tmp.roll({rollaxis:-Is}, roll_coords=False)
+        tmp = tmp.roll({rollaxis: -Is}, roll_coords=False)
         # prepare for numpy
         workarray = tmp.transpose(*dimsin).values
 
     elif metric == "dy":
-        rollaxis = 'yh'  # rolling axis is Y
-        subaxis = 'xq'   # subsample axis is Y
-        sumaxis = 0      # summation axis is Y (=0 for numpy)
+        rollaxis = "yh"  # rolling axis is Y
+        subaxis = "xq"  # subsample axis is Y
+        sumaxis = 0  # summation axis is Y (=0 for numpy)
         ny, nx = ds[varin].shape
 
         # subsample along X
-        tmp = ds[varin].isel({subaxis: slice(Is,nx+1,2)})
+        tmp = ds[varin].isel({subaxis: slice(Is, nx + 1, 2)})
         # roll along Y (towards south)
-        tmp = tmp.roll({rollaxis:-Js}, roll_coords=False)
+        tmp = tmp.roll({rollaxis: -Js}, roll_coords=False)
         # prepare for numpy
         workarray = tmp.transpose(*dimsin).values
         # correct north pole fold (assuming Q-pivot)
         if Js != 0:
-            workarray[-1,:] = workarray[-2,::-1]
+            workarray[-1, :] = workarray[-2, ::-1]
 
     else:
         raise ValueError("unknown metric")
@@ -208,12 +214,12 @@ def downsample2_gridmetric(ds, metric="dx", point="T", sym=False):
     # if the point type of the metric is a corner type
     # on the metric axis (e.g. downsampled dxU has coords yh, xq)
     if sym:
-        if (metric == 'dx') and ('xq' in dims):
+        if (metric == "dx") and ("xq" in dims):
             # use E-W periodicity for dxU
-            out = xr.concat([out.isel(xq=-1), out], dim='xq')
-        if (metric == 'dy') and ('yq' in dims):
+            out = xr.concat([out.isel(xq=-1), out], dim="xq")
+        if (metric == "dy") and ("yq" in dims):
             # duplicate southernmost row for dyV
-            out = xr.concat([out.isel(yq=0), out], dim='yq')
+            out = xr.concat([out.isel(yq=0), out], dim="yq")
 
     return out.transpose(*dims)
 
@@ -246,8 +252,8 @@ def downsample2_2dvar(ds, variable, point, op="sum", dimvar_map=None, sym=False)
         raise ValueError("Unknown point type")
 
     dimsin = ("yh", "xh")
-    xdim = find_dimname(dimsin, 'x')
-    ydim = find_dimname(dimsin, 'y')
+    xdim = find_dimname(dimsin, "x")
+    ydim = find_dimname(dimsin, "y")
 
     # symetric grid do not matter since all native variables
     # are on the T-point
@@ -256,35 +262,35 @@ def downsample2_2dvar(ds, variable, point, op="sum", dimvar_map=None, sym=False)
     mask = ds[maskname]
 
     # roll along X (correct if E-W periodic)
-    area = area.roll({xdim:-Is}, roll_coords=False)
-    mask = mask.roll({xdim:-Is}, roll_coords=False)
+    area = area.roll({xdim: -Is}, roll_coords=False)
+    mask = mask.roll({xdim: -Is}, roll_coords=False)
     # roll along Y (towards south)
-    area = area.roll({ydim:-Js}, roll_coords=False)
-    mask = mask.roll({ydim:-Js}, roll_coords=False)
+    area = area.roll({ydim: -Js}, roll_coords=False)
+    mask = mask.roll({ydim: -Js}, roll_coords=False)
     # prepare for numpy
     workarea = area.transpose(*dimsin).values
     workmask = mask.transpose(*dimsin).values
     # correct north pole fold (assuming Q-pivot)
     if Js != 0:
-        workarea[-1,:] = workarea[-2,::-1]
-        workmask[-1,:] = workmask[-2,::-1]
+        workarea[-1, :] = workarea[-2, ::-1]
+        workmask[-1, :] = workmask[-2, ::-1]
 
-    if 'area' in variable:
+    if "area" in variable:
         workarray = workarea
-    elif 'wet' in variable:
+    elif "wet" in variable:
         workarray = workmask
     else:
         tmp = ds[variable]
         assert tmp.dims == dimsin
         # roll along X (correct if E-W periodic)
-        tmp = tmp.roll({xdim:-Is}, roll_coords=False)
+        tmp = tmp.roll({xdim: -Is}, roll_coords=False)
         # roll along Y (towards south)
-        tmp = tmp.roll({ydim:-Js}, roll_coords=False)
+        tmp = tmp.roll({ydim: -Js}, roll_coords=False)
         # prepare for numpy
         workarray = tmp.transpose(*dimsin).values
         # correct north pole fold (assuming Q-pivot)
         if Js != 0:
-            workarray[-1,:] = workarray[-2,::-1]
+            workarray[-1, :] = workarray[-2, ::-1]
 
     ny, nx = workarea.shape
     assert int(ny / 2) == ny / 2
@@ -313,12 +319,12 @@ def downsample2_2dvar(ds, variable, point, op="sum", dimvar_map=None, sym=False)
     # if the point type of the metric is a corner type
     # on the metric axis (e.g. downsampled dxU has coords yh, xq)
     if sym:
-        if ('xq' in dims):
+        if "xq" in dims:
             # use E-W periodicity for dxU
-            out = xr.concat([out.isel(xq=-1), out], dim='xq')
-        if ('yq' in dims):
+            out = xr.concat([out.isel(xq=-1), out], dim="xq")
+        if "yq" in dims:
             # duplicate southernmost row for dyV
-            out = xr.concat([out.isel(yq=0), out], dim='yq')
+            out = xr.concat([out.isel(yq=0), out], dim="yq")
 
     return out.transpose(*dims)
 
@@ -399,9 +405,9 @@ def mask_kernel_d2(array):
 
 def is_symetric(ds):
     """check if grid is symetric or not"""
-    if (len(ds['xq']) == len(ds['xh']) + 1) and (len(ds['yq']) == len(ds['yh']) + 1):
+    if (len(ds["xq"]) == len(ds["xh"]) + 1) and (len(ds["yq"]) == len(ds["yh"]) + 1):
         return True
-    elif (len(ds['xq']) == len(ds['xh'])) and (len(ds['yq']) == len(ds['yh'])):
+    elif (len(ds["xq"]) == len(ds["xh"])) and (len(ds["yq"]) == len(ds["yh"])):
         return False
     else:
         raise ValueError("inconsistent dimensions sizes")
