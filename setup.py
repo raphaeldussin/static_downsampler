@@ -7,7 +7,7 @@ TESTS_REQUIRE = ['pytest >= 2.8', 'pytest_datafiles']
 
 setuptools.setup(
     name="static_downsampler",
-    version="0.0.1",
+    version="0.0.2",
     author="Raphael Dussin",
     author_email="raphael.dussin@gmail.com",
     description=("A tool to downsample MOM static files"),
