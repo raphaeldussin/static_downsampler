@@ -3,6 +3,7 @@ import setuptools
 
 
 INSTALL_REQUIRES = ["numpy", "xarray", "dask", "netCDF4"]
+TESTS_REQUIRE = ['pytest >= 2.8', 'pytest_datafiles']
 
 setuptools.setup(
     name="static_downsampler",
@@ -15,6 +16,7 @@ setuptools.setup(
     url="https://github.com/raphaeldussin/static_downsampler",
     packages=["static_downsampler"],
     install_requires=INSTALL_REQUIRES,
+    tests_require=TESTS_REQUIRE,
     scripts=[
         "static_downsampler/downsample.py",
         "static_downsampler/create_hgrid_d2.py",
