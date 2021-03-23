@@ -3,8 +3,7 @@ import numpy as np
 import pytest
 import xarray as xr
 
-from static_downsampler.static import (check_grid, define_start_point,
-                                       sum_on_supergrid)
+from static_downsampler.static import check_grid, define_start_point, sum_on_supergrid
 
 # define global dims size
 ny = 180
@@ -24,18 +23,10 @@ ds_sym = xr.Dataset(
     ),
     coords=dict(
         x=xr.DataArray(
-            np.arange(lonE, lonW + hres),
-            dims=["nxp"],
-            attrs={
-                "units": "degrees",
-            },
+            np.arange(lonE, lonW + hres), dims=["nxp"], attrs={"units": "degrees",},
         ),
         y=xr.DataArray(
-            np.arange(latS, latN + hres),
-            dims=["nyp"],
-            attrs={
-                "units": "degrees",
-            },
+            np.arange(latS, latN + hres), dims=["nyp"], attrs={"units": "degrees",},
         ),
     ),
 )
@@ -49,18 +40,10 @@ ds_nonsym = xr.Dataset(
     ),
     coords=dict(
         x=xr.DataArray(
-            np.arange(lonE, lonW),
-            dims=["nxp"],
-            attrs={
-                "units": "degrees",
-            },
+            np.arange(lonE, lonW), dims=["nxp"], attrs={"units": "degrees",},
         ),
         y=xr.DataArray(
-            np.arange(latS, latN),
-            dims=["nyp"],
-            attrs={
-                "units": "degrees",
-            },
+            np.arange(latS, latN), dims=["nyp"], attrs={"units": "degrees",},
         ),
     ),
 )

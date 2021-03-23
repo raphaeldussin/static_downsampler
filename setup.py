@@ -1,6 +1,9 @@
 """ setup for static_downsampler """
 import setuptools
 
+
+INSTALL_REQUIRES = ["numpy", "xarray", "dask", "netCDF4"]
+
 setuptools.setup(
     name="static_downsampler",
     version="0.0.1",
@@ -11,6 +14,7 @@ setuptools.setup(
     keywords="",
     url="https://github.com/raphaeldussin/static_downsampler",
     packages=["static_downsampler"],
+    install_requires=INSTALL_REQUIRES,
     scripts=[
         "static_downsampler/downsample.py",
         "static_downsampler/create_hgrid_d2.py",

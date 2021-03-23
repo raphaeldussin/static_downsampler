@@ -13,18 +13,15 @@ from static_downsampler.static import (
 )
 
 GRID_OM4_125 = os.path.join(
-    os.path.dirname(os.path.realpath(__file__)),
-    "files_OM4_125/",
+    os.path.dirname(os.path.realpath(__file__)), "files_OM4_125/",
 )
 
 GRID_OM4_025 = os.path.join(
-    os.path.dirname(os.path.realpath(__file__)),
-    "files_OM4_025/",
+    os.path.dirname(os.path.realpath(__file__)), "files_OM4_025/",
 )
 
 GRID_OM4_05 = os.path.join(
-    os.path.dirname(os.path.realpath(__file__)),
-    "files_OM4_05/",
+    os.path.dirname(os.path.realpath(__file__)), "files_OM4_05/",
 )
 
 
