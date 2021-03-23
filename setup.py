@@ -2,7 +2,7 @@
 import setuptools
 
 
-INSTALL_REQUIRES = ["numpy", "xarray", "dask", "netCDF4"]
+INSTALL_REQUIRES = ["numpy", "xarray", "dask", "netCDF4", "numba"]
 TESTS_REQUIRE = ['pytest >= 2.8', 'pytest_datafiles']
 
 setuptools.setup(
