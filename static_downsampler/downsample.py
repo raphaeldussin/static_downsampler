@@ -46,7 +46,7 @@ def downsample2_dataset(ds, sym=False):
 
     ds_d2["deptho"] = downsample2_2dvar(ds, "deptho", "T", op="masked_avg", sym=sym)
     ds_d2["hfgeou"] = downsample2_2dvar(ds, "hfgeou", "T", op="masked_avg", sym=sym)
-    ds_d2["sftof"] = downsample2_2dvar(ds, "sftof", "T", op="masked_avg", sym=sym)
+    ds_d2["sftof"] = downsample2_2dvar(ds, "sftof", "T", op="unnormalized_avg", sym=sym)
 
     ds_d2["wet"] = downsample2_2dvar(ds, "wet", "T", op="mask", sym=sym)
     ds_d2["wet_c"] = downsample2_2dvar(ds, "wet_c", "Q", op="mask", sym=sym)
@@ -308,6 +308,8 @@ def downsample2_2dvar(ds, variable, point, op="sum", dimvar_map=None, sym=False)
         data = sum_kernel_d2(workarray)
     elif op == "masked_avg":
         data = masked_mean_kernel_d2(workarray, workarea * workmask)
+    elif op == "unnormalized_avg":
+        data = masked_mean_kernel_d2(workarray, workarea, normalized=False)
     elif op == "mask":
         data = mask_kernel_d2(workarray)
     else:
@@ -337,7 +339,7 @@ def sum_kernel_d2(array):
 
 
 @njit
-def masked_mean_kernel_d2(array, areacell):
+def masked_mean_kernel_d2(array, areacell, normalized=True):
     ny, nx = array.shape
     ny_d2, nx_d2 = int(ny / 2), int(nx / 2)
     out = np.zeros((ny_d2, nx_d2))
@@ -356,14 +358,17 @@ def masked_mean_kernel_d2(array, areacell):
 
             # count ocean values
             area_tot = 0
-            if a00 != 0:
-                area_tot += b00
-            if a01 != 0:
-                area_tot += b01
-            if a10 != 0:
-                area_tot += b10
-            if a11 != 0:
-                area_tot += b11
+            if normalized:
+                if a00 != 0:
+                    area_tot += b00
+                if a01 != 0:
+                    area_tot += b01
+                if a10 != 0:
+                    area_tot += b10
+                if a11 != 0:
+                    area_tot += b11
+            else:
+                area_tot = b00 + b01 + b10 + b11
 
             if area_tot == 0:
                 out[jj, ji] = 0
